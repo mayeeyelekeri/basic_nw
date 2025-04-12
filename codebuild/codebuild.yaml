@@ -206,7 +206,21 @@ Resources:
                  - ecr:CompleteLayerUpload
                  - ecr:PutImage
                Resource: "*"
-# Outputs 
+
+  # Custome resource to empty S3 CodeBuild bucket 
+  # Inputs:
+  # 1) CodeBuild Bucket reference 
+  # 2) S3-Lambda Funcation Role ARN (created in Perm stack) 
+  # 
+  customBucketCleanupResource:
+    Type: 'AWS::CloudFormation::CustomResource'
+    Properties:
+      ServiceToken:  
+        Fn::ImportValue: 
+          Fn::Sub: "${permStackName}-S3-LAMBDA-FUNCTION-ARN"
+      BucketName: !Ref codebuildBucket 
+
+# Outputs     
 # 1) Code Build bucket 
 # 2) Code Build project 
 # 3) Git Credentials 
