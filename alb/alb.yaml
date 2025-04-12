@@ -19,10 +19,15 @@ Parameters:
     Default: nw
 
   permStackName:
-    Description: Name of the base stack with all network resources
+    Description: Permissions stack 
     Type: String
     Default: perm
-
+    
+  ec2StackName:
+    Description: EC2 stack
+    Type: String
+    Default: ec2
+  
   environment: 
     Type: String 
     Default: dev 
@@ -42,7 +47,7 @@ Resources:
   # Create a target group for application port
   # This will only create the target group, EC2 instances are attached from the autoscaling group 
   # Inputs: 
-  # 1) application Port from Parameter store 
+  # 1) application Port from Parameter store (port 80)
   # 2) VPC ID (from network stack)
   #    
   targetGroup1:
@@ -55,12 +60,25 @@ Resources:
         Fn::ImportValue: 
          Fn::Sub: "${networkStackName}-VPCID"
       TargetType: ip 
+      
+      # ***** Testing, no need to attach targets here 
+      Targets: 
+        - Id: 
+            Fn::ImportValue: 
+                Fn::Sub: "${ec2StackName}-INSTANCE-PRIVATE-IP"
       Tags:
         - Key: Name
           Value: !Join [" - ", [Fn::Sub: "${AWS::StackName}", "TargetGroup-1"]]
         - Key: Environment
           Value: !Sub ${environment}
 
+  # 
+  # Create a target group for application port
+  # This will only create the target group, EC2 instances are attached from the autoscaling group 
+  # Inputs: 
+  # 1) application Port from Parameter store (port 8080)
+  # 2) VPC ID (from network stack)
+  #   
   targetGroup2:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -71,6 +89,12 @@ Resources:
         Fn::ImportValue: 
          Fn::Sub: "${networkStackName}-VPCID"
       TargetType: ip 
+      
+      # ***** Testing, no need to attach targets here 
+      Targets: 
+        - Id: 
+            Fn::ImportValue: 
+                Fn::Sub: "${ec2StackName}-INSTANCE-PRIVATE-IP"
       Tags:
         - Key: Name
           Value: !Join [" - ", [Fn::Sub: "${AWS::StackName}", "TargetGroup-2"]]

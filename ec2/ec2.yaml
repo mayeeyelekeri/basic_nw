@@ -148,4 +148,12 @@ Outputs:
     Export:
       "Name" :
         Fn::Sub: "${AWS::StackName}-PUBLIC-INSTANCE"
-  
+
+#
+  privateIPAddress:
+    Condition: createOnlyProdResources
+    Value: !GetAtt publicInstance.PrivateIpAddress
+    Export:
+      "Name" :
+        Fn::Sub: "${AWS::StackName}-INSTANCE-PRIVATE-IP"  
+        
